@@ -3,7 +3,7 @@ CSV Importer for HDFCBank, India.
 
 Please select the option as "delimited" while importing your statements.
 
-Some cleanup is needed.
+Some cleanup is needed which is included.
 1) remove the empty line at the top
 2) Trim the spaces before/after the CSV headers
 3) remove the ',' inside narrations (which obviously shoundn't be there in first place)
@@ -33,7 +33,15 @@ class Importer(importer.ImporterProtocol):
         self.account = account
 
     def identify(self, file):
-        return re.match(".*Value Dat,Debit Amount,Credit Amount,Chq/Ref Number,Closing Balance", file.head())
+        lines_to_check = 5
+        pattern = "Date.*Narration.*Value Dat.*Debit Amount.*Credit Amount.*Chq/Ref Number.*Closing Balance"
+        with open(file.name) as infile:
+            for _ in range(lines_to_check):
+                line = next(infile).strip()
+                if re.match(pattern, line):
+                    return True
+        return False
+
 
     def file_name(self, file):
         return 'hdfcbank.{}'.format(path.basename(file.name))
@@ -48,37 +56,57 @@ class Importer(importer.ImporterProtocol):
                 date= row['Date']
             return parse(date, dayfirst=True).date()
 
+    def cleanup_transactions(self, file):
+        
+        transactions = []
+        with open(file.name) as infile:
+            #transactions = [re.sub('NETBANK,','NETBANK',re.sub(' {2,}', ' ',line)) for line in infile if line.strip()]
+            for line in infile:
+                #strip all empty lines
+                if line.strip():
+                    line = re.sub(' {2,}', ' ',line) #2 or more spaces
+                    line = re.sub('^\s*','', line) # spaces at beginning
+                    line = re.sub('NETBANK,','NETBANK', line) #specific to NEFT
+
+                    transactions.append(line)
+        #remove unnecessary spaces in header
+        transactions[0] = re.sub('\s*,\s*',',', transactions[0])
+       
+        print(transactions[0])
+        return transactions
+    
     def extract(self, file):
         entries = []
         index = 0
 
-        with open(file.name) as infile:
-            for index, row in enumerate(csv.DictReader(infile)):
-                meta = data.new_metadata(file.name, index)
-                date = parse(row['Date'], dayfirst=True).date()
-                narration =f"({row['Narration'].strip()})"
-                credit_amt = D(row['Credit Amount'])              
-                debit_amt = D(row['Debit Amount'])
+        transactions = self.cleanup_transactions(file)
 
-                amt = credit_amt - debit_amt
+        for index, row in enumerate(csv.DictReader(transactions)):
+            meta = data.new_metadata(file.name, index)
+            date = parse(row['Date'], dayfirst=True).date()
+            narration =f"({row['Narration'].strip()})"
+            credit_amt = D(row['Credit Amount'])              
+            debit_amt = D(row['Debit Amount'])
 
-                txn = data.Transaction(
-                    meta,
-                    date,
-                    self.FLAG, #flag
-                    None, #payee
-                    narration,
-                    data.EMPTY_SET, # tags,
-                    data.EMPTY_SET, # link
-                    [
-                        data.Posting(self.account, 
-                                        amount.Amount(D(amt), self.currency),
-                                        None, None, None, None),
-                    ]
-                )
+            amt = credit_amt - debit_amt
+
+            txn = data.Transaction(
+                meta,
+                date,
+                self.FLAG, #flag
+                None, #payee
+                narration,
+                data.EMPTY_SET, # tags,
+                data.EMPTY_SET, # link
+                [
+                    data.Posting(self.account, 
+                                    amount.Amount(D(amt), self.currency),
+                                    None, None, None, None),
+                ]
+            )
 
 
-                entries.append(txn)
+            entries.append(txn)
         
         if index:
             balance = row['Closing Balance']
@@ -90,5 +118,3 @@ class Importer(importer.ImporterProtocol):
                             None, None))
 
         return entries
-
-

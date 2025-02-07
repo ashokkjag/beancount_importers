@@ -9,7 +9,7 @@ Some cleanup is needed which is included.
 3) remove the ',' inside narrations (which obviously shoundn't be there in first place)
 """
 
-__copyright__ = "Copyright (C) 2024 Ashok Kumar Jagadeeswaran"
+__copyright__ = "Copyright (C) 2025 Ashok Kumar Jagadeeswaran"
 __license__ = "GNU AGPLv3"
 
 
@@ -44,17 +44,19 @@ class Importer(importer.ImporterProtocol):
 
 
     def file_name(self, file):
-        return 'hdfcbank.{}'.format(path.basename(file.name))
+        return 'hdfcbank.{}.csv'.format(self.file_date(file))
 
     def file_account(self, _):
         return self.account
 
     def file_date(self, file):
-        with open(file.name) as infile:
-            reader = csv.DictReader(infile)
-            for row in reader:
-                date= row['Date']
-            return parse(date, dayfirst=True).date()
+        transactions = self.cleanup_transactions(file)
+
+        reader = csv.DictReader(transactions)
+        for row in reader:
+            date= row['Date']
+        
+        return parse(date, dayfirst=True).date()
 
     def cleanup_transactions(self, file):
         
@@ -72,7 +74,6 @@ class Importer(importer.ImporterProtocol):
         #remove unnecessary spaces in header
         transactions[0] = re.sub('\s*,\s*',',', transactions[0])
        
-        print(transactions[0])
         return transactions
     
     def extract(self, file):

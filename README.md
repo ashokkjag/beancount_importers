@@ -4,6 +4,9 @@ Some beancount importers for India
 Currently supported institutions
 - Banks
     - HDFCBank
+        - csv/Delimited
+    - ICICIBank
+        - xls
 
 # instructions to use
 ```

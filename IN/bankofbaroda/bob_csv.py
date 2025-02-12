@@ -50,8 +50,9 @@ class Importer(importer.ImporterProtocol):
         transactions = self.fetch_transactions(file.name)
 
         reader = csv.DictReader(transactions)
-        for row in reader:
-            date= row['DATE']
+        
+        row = next(reader)
+        date= row['TRAN DATE']
         
         return parse(date, dayfirst=True).date()
 

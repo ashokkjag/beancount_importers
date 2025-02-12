@@ -7,6 +7,8 @@ Currently supported institutions
         - csv/Delimited
     - ICICIBank
         - xls
+    - Bank of Baroda
+        - csv
 
 # instructions to use
 ```

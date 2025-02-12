@@ -1,0 +1,64 @@
+
+2025-02-01 * "(ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  56.75 INR
+
+2025-02-01 * "(NEFT-ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  60000.00 INR
+
+2025-02-01 * "(UPI/5ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  -9336.59 INR
+
+2025-02-01 * "(UPI/ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  10.00 INR
+
+2025-02-02 * "(12344:Int.Pd:01-11-2024 to 31-01-2025)"
+  Assets:Bankofbaroda  1563.00 INR
+
+2025-02-02 * "(ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  -289.00 INR
+
+2025-02-04 * "(ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  -4224.00 INR
+
+2025-02-05 * "(ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  -17.77 INR
+
+2025-02-05 * "(ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  -500.00 INR
+
+2025-02-06 * "(ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  -197.00 INR
+
+2025-02-06 * "(UPI/5ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  -765.00 INR
+
+2025-02-06 * "(ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  -150.00 INR
+
+2025-02-07 * "(ABCDE/ABCDE/ABCDE : Closure Proceeds)"
+  Assets:Bankofbaroda  86000.00 INR
+
+2025-02-07 * "(1235455  Int:116.00 and TAX:11.00.)"
+  Assets:Bankofbaroda  105.00 INR
+
+2025-02-07 * "(1234555  Int:548.00 and TAX:55.00.)"
+  Assets:Bankofbaroda  493.00 INR
+
+2025-02-08 * "(Dr. Tran)"
+  Assets:Bankofbaroda  -240000.00 INR
+
+2025-02-09 * "(UPI/ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  0 INR
+
+2025-02-09 * "(UPI/ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  2500.00 INR
+
+2025-02-09 * "(UPI/ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  -120.00 INR
+
+2025-02-10 * "(UPI/ABCDE/ABCDE/ABCDE)"
+  Assets:Bankofbaroda  7000.00 INR
+
+2025-02-11 balance Assets:Bankofbaroda                  51874.11 INR
+
+

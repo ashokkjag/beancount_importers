@@ -33,6 +33,9 @@ class Importer(importer.ImporterProtocol):
         self.account = account
 
     def identify(self, file):
+        if not re.search("hdfc.*csv$", file.name):
+            return False
+
         lines_to_check = 5
         pattern = "Date.*Narration.*Value Dat.*Debit Amount.*Credit Amount.*Chq/Ref Number.*Closing Balance"
         with open(file.name) as infile:

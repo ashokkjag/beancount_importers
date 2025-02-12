@@ -7,6 +7,6 @@ from IN.icicibank import icicibank_xls
 
 
 CONFIG = [
-    hdfcbank_csv.Importer("INR", "Assets:IN:HDFCBANK:Savings"),
-    icicibank_xls.Importer("INR", "Assets:IN:HDFCBANK:Savings")
+    hdfcbank_csv.Importer("INR", "Assets:IN:HDFCBank:Savings"),
+    icicibank_xls.Importer("INR", "Assets:IN:ICICIBank:Savings")
 ]

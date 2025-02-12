@@ -25,11 +25,9 @@ class Importer(importer.ImporterProtocol):
         self.account = account
 
     def identify(self, file):
-        print("bob")
         if not re.search("bob.*csv$", file.name):
             return False
 
-        print("bob header check")
         lines_to_check = 25
         pattern = r"TRAN DATE.*,NARRATION.*CHQ.NO..*WITHDRAWAL.*,DEPOSIT.*BALANCE.*"
 
@@ -37,8 +35,8 @@ class Importer(importer.ImporterProtocol):
             for _ in range(lines_to_check):
                 line = next(infile).strip()
                 if re.match(pattern, line):
-                    print("bob match")
                     return True
+                
         return False
 
     def file_name(self, file):

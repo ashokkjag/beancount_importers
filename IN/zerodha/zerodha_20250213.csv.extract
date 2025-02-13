@@ -1,0 +1,18 @@
+
+2025-01-08 * "buy ITC on BSE (order id 123)"
+  Assets:Investments:Zerodha        500.0000 ITC {477.65 INR, 2025-01-08}
+  Assets:Zerodha:Cash         -238825.000000 INR
+
+2025-01-08 * "buy POWERGRID on NSE (order id 124)"
+  Assets:Investments:Zerodha       100.0000 POWERGRID {313.50 INR, 2025-01-08}
+  Assets:Zerodha:Cash         -31350.000000 INR
+
+2025-01-21 * "sell ITC on BSE (order id 234)"
+  Assets:Investments:Zerodha     -145.0000 ITC {} @ 450.90 INR
+  Assets:Zerodha:Cash         65380.500000 INR
+
+2025-01-21 * "sell POWERGRID on BSE (order id 235)"
+  Assets:Investments:Zerodha      -50.0000 POWERGRID {} @ 305.00 INR
+  Assets:Zerodha:Cash         15250.000000 INR
+
+

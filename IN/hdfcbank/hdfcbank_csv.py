@@ -70,12 +70,12 @@ class Importer(importer.ImporterProtocol):
                 #strip all empty lines
                 if line.strip():
                     line = re.sub(' {2,}', ' ',line) #2 or more spaces
-                    line = re.sub('^\s*','', line) # spaces at beginning
+                    line = re.sub(r'^\s*','', line) # spaces at beginning
                     line = re.sub('NETBANK,','NETBANK', line) #specific to NEFT
 
                     transactions.append(line)
         #remove unnecessary spaces in header
-        transactions[0] = re.sub('\s*,\s*',',', transactions[0])
+        transactions[0] = re.sub(r'\s*,\s*',',', transactions[0])
        
         return transactions
     

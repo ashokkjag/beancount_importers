@@ -32,7 +32,9 @@ class Importer(importer.ImporterProtocol):
     def identify(self, file):
         if not re.search("zerodha.*csv$", file.name):
             return False
-        return re.match("symbol,isin,trade_date,exchange,segment,series,trade_type,auction,quantity,price,trade_id,order_id,order_execution_time", file.head())
+        if re.match("symbol,isin,trade_date,exchange,segment,series,trade_type,auction,quantity,price,trade_id,order_id,order_execution_time", file.head()):
+            return True
+        return False
 
     def file_name(self, file):
         return 'zerodha.{}.csv'.format(self.file_date(file))

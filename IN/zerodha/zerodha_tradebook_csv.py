@@ -54,6 +54,8 @@ class Importer(importer.ImporterProtocol):
         index = 0
 
         with open(file.name) as infile:
+            dummy_sell_date = parse("1900-01-11").date()
+            dummy_sell_price = D("0")
             currency_precision = D("0.01")
             commodity_precision = D("0.0001")
             for index, row in enumerate(csv.DictReader(infile)):
@@ -93,7 +95,8 @@ class Importer(importer.ImporterProtocol):
              
                 elif trade_type == 'sell':
                     # this will need manual matching of lots
-                    cost = position.Cost(None, self.currency, None, None)
+                    # fava has issue with empty cost for sell, so populate dummy values
+                    cost = position.Cost(dummy_sell_price, self.currency, dummy_sell_date , None)
 
                     txn = data.Transaction(
                         meta,

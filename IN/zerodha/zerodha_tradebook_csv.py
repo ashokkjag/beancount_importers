@@ -7,11 +7,11 @@ __license__ = "GNU AGPLv3"
 
 
 from beancount.core import data
-from beancount.core import account
+from beancount.core import number
 from beancount.core import amount
 from beancount.core import position
 from beancount.ingest import importer
-from beancount.core.number import D
+from beancount.core.amount import D
 
 from dateutil.parser import parse
 # from decimal import Decimal
@@ -30,10 +30,12 @@ class Importer(importer.ImporterProtocol):
         self.account_cash = account_cash
         
     def identify(self, file):
+        if not re.search("zerodha.*csv$", file.name):
+            return False
         return re.match("symbol,isin,trade_date,exchange,segment,series,trade_type,auction,quantity,price,trade_id,order_id,order_execution_time", file.head())
 
     def file_name(self, file):
-        return 'zerodha.{}'.format(path.basename(file.name))
+        return 'zerodha.{}.csv'.format(self.file_date(file))
 
     def file_account(self, _):
         return self.account_root
@@ -50,16 +52,18 @@ class Importer(importer.ImporterProtocol):
         index = 0
 
         with open(file.name) as infile:
+            currency_precision = D("0.01")
+            commodity_precision = D("0.0001")
             for index, row in enumerate(csv.DictReader(infile)):
                 meta = data.new_metadata(file.name, index)
                 date = parse(row['trade_date']).date()
                 ticker = row['symbol']
                 trade_type = row['trade_type']
                 narration = f"{trade_type} {ticker} on {row['exchange']} (order id {row['order_id']})"
-                price = D(row['price'].strip())
+                price = number.round_to(D(row['price'].strip()), currency_precision)
                 price_units = amount.Amount(price, self.currency)
                 
-                quantity = D(row['quantity'])
+                quantity = number.round_to(D(row['quantity']), commodity_precision)
                 quantity_units = amount.Amount(quantity, ticker)
 
                 total = amount.mul(price_units, quantity)

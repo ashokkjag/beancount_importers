@@ -1,14 +1,19 @@
 # beancount-importers
-Some beancount importers for India
+Some beancount V2 importers for India
 
 Currently supported institutions
 - Banks
     - HDFCBank
-        - csv/Delimited
+        - csv/Delimited - File name should match pattern `hdfc.*.csv`
     - ICICIBank
-        - xls
+        - xls - File name should match pattern `icici.*.xls`
     - Bank of Baroda
-        - csv
+        - csv - File name should match pattern `bob.*.csv`
+- Brokers
+    - Zerodha
+        - CSV Tradebook - File name should match pattern `zerodha.*.csv`
+            - Importer adds the symbol name as the commodity name
+            - Sell transactions will need manual lot matching
 
 # instructions to use
 ```

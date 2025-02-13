@@ -26,6 +26,7 @@ class Importer(importer.ImporterProtocol):
     def identify(self, file):
         if re.search("icici.*xls$", file.name):
             return True 
+        return False
 
     def file_name(self, file):
         return 'icicibank.{}.xls'.format(self.file_date(file))

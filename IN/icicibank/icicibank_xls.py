@@ -57,10 +57,10 @@ class Importer(importer.ImporterProtocol):
 
         for rownum in range(sheet.nrows): 
             if sheet.row_values(rownum)[last_col] != '':
-                transaction = ",".join(sheet.row_values(rownum)[1:])
+                transaction = ",".join(list(map(str,sheet.row_values(rownum)[1:])))
                 transaction = re.sub(r'\s+', ' ', transaction)
                 transactions.append(transaction)
-                
+             
         transactions[0] = transactions[0].replace(' (INR )', '')
         
         return transactions

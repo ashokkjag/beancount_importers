@@ -10,12 +10,10 @@ __copyright__ = "Copyright (C) 2025 Ashok Kumar Jagadeeswaran"
 __license__ = "GNU AGPLv3"
 
 
-from beancount.core import data
-from beancount.core import amount
-from beancount.core import account
+from beancount.core import data, amount, account, flags
 from beancount.core.number import D
 from beancount.core.position import Cost
-from beancount.ingest import importer
+import beangulp
 
 from dateutil.parser import parse
 
@@ -28,57 +26,58 @@ from os import path
 
 
 
-class Importer(importer.ImporterProtocol):
+class Importer(beangulp.Importer):
 
-    def __init__(self, password, base_currency, account_root, account_cash):
+    def __init__(self, password, base_currency, account_root, account_cash, account_fees):
         self.password = password
         self.base_currency = base_currency
         self.account_root = account_root
         self.account_cash = account_cash
+        self.account_fees = account_fees
 
-    def identify(self, file):
+    def identify(self, filepath):
 
-        if not re.search("cas.*pdf$", file.name):
+        if not re.search("cas.*pdf$", filepath):
             return False
         
-        transactions = self.fetch_transactions(file)
+        transactions = self.fetch_transactions(filepath)
 
         if re.search("amc,folio,pan,scheme,advisor,isin,amfi,date,description,amount,units,nav,balance,type,dividend", transactions[0]):
             return True
         return False
 
-    def file_name(self, file):
-        return 'mf_cas.{}.pdf'.format(self.file_date(file))
+    def filename(self, filepath):
+        return 'mf_cas.{}.pdf'.format(self.file_date(filepath))
 
-    def file_account(self, _):
+    def account(self, _):
         return self.account_root
 
-    def file_date(self, file):
-        transactions = self.fetch_transactions(file)
+    def date(self, filepath):
+        transactions = self.fetch_transactions(filepath)
         reader = csv.DictReader(transactions)
         for row in reader:
             date= row['Date']
         return parse(date, dayfirst=True).date()
     
-    def fetch_transactions(self, file):
-        csv_str = casparser.read_cas_pdf(file.name, self.password, output="csv")
+    def fetch_transactions(self, filepath):
+        csv_str = casparser.read_cas_pdf(filepath, self.password, output="csv")
         transactions = csv_str.splitlines()
         return transactions
 
-    def extract(self, file):
+    def extract(self, filepath, existing):
         entries = []
         index = 0
         dummy_cost_date = parse("1900-01-01").date()
         dummy_cost_price = D("0")
 
-        transactions = self.fetch_transactions(file)
+        transactions = self.fetch_transactions(filepath)
 
         for index, row in enumerate(csv.DictReader(transactions)):
             folio = row['folio'].split('/')[0]
             mfShortName = row['amc'].removesuffix("Mutual Fund").strip().replace(' ','')
             accountName = account.join(self.account_root, mfShortName, folio)
             date = parse(row['date']).date()
-            meta = data.new_metadata(file.name, index, {"scheme" : row['scheme']})
+            meta = data.new_metadata(filepath, index, {"scheme" : row['scheme']})
             narration=f"{row['type']} ({row['description']})"
             isin = row['isin'].strip()
             units = D(row['units'])
@@ -93,7 +92,7 @@ class Importer(importer.ImporterProtocol):
                 cost = Cost(nav, self.base_currency, date, None)
                 txn = data.Transaction(meta, 
                                         date, 
-                                        self.FLAG, 
+                                        flags.FLAG_OKAY, 
                                         None, 
                                         narration, 
                                         data.EMPTY_SET,
@@ -109,7 +108,7 @@ class Importer(importer.ImporterProtocol):
                 price = amount.Amount(nav, self.base_currency)
                 txn = data.Transaction(meta,
                                         date,
-                                        self.FLAG,
+                                        flags.FLAG_OKAY,
                                         None,
                                         narration,
                                         data.EMPTY_SET,
@@ -123,13 +122,13 @@ class Importer(importer.ImporterProtocol):
                 
                 txn = data.Transaction(meta,
                                         date,
-                                        self.FLAG,
+                                        flags.FLAG_OKAY,
                                         None,
                                         narration,
                                         data.EMPTY_SET,
                                         data.EMPTY_SET,
                                         [
-                                            data.Posting(self.account_cash, -value, None, None, None, None ),
+                                            data.Posting(self.account_fees, value, None, None, None, None ),
                                         ]
                                         )
             else:

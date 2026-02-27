@@ -6,12 +6,10 @@ __copyright__ = "Copyright (C) 2024 Ashok Kumar Jagadeeswaran"
 __license__ = "GNU AGPLv3"
 
 
-from beancount.core import data
-from beancount.core import number
-from beancount.core import amount
-from beancount.core import position
-from beancount.ingest import importer
+from beancount.core import data, number, amount, position, flags
 from beancount.core.amount import D
+
+import beangulp
 
 from dateutil.parser import parse
 # from decimal import Decimal
@@ -22,7 +20,7 @@ import re
 import logging
 from os import path
 
-class Importer(importer.ImporterProtocol):
+class Importer(beangulp.Importer):
 
     def __init__(self, currency, account_root, account_cash):
         self.currency = currency
@@ -30,36 +28,37 @@ class Importer(importer.ImporterProtocol):
         self.account_cash = account_cash
         
     def identify(self, file):
-        if not re.search("zerodha.*csv$", file.name):
+        if not re.search("zerodha.*csv$", file):
             return False
-        if re.match("symbol,isin,trade_date,exchange,segment,series,trade_type,auction,quantity,price,trade_id,order_id,order_execution_time", file.head()):
-            return True
+        with open (file,'r') as f:
+            if re.match("symbol,isin,trade_date,exchange,segment,series,trade_type,auction,quantity,price,trade_id,order_id,order_execution_time", f.readline()):
+                return True
         return False
 
-    def file_name(self, file):
-        return 'zerodha.{}.csv'.format(self.file_date(file))
+    def filename(self, file):
+        return 'zerodha.{}.csv'.format(self.date(file))
 
-    def file_account(self, _):
+    def account(self, _):
         return self.account_root
 
-    def file_date(self, file):
-        with open(file.name) as infile:
+    def date(self, file):
+        with open(file) as infile:
             reader = csv.DictReader(infile)
             for row in reader:
                 date= row['trade_date']
             return parse(date).date()
 
-    def extract(self, file):
+    def extract(self, file, existing):
         entries = []
         index = 0
 
-        with open(file.name) as infile:
+        with open(file) as infile:
             dummy_sell_date = parse("1900-01-11").date()
             dummy_sell_price = D("0")
             currency_precision = D("0.01")
             commodity_precision = D("0.0001")
             for index, row in enumerate(csv.DictReader(infile)):
-                meta = data.new_metadata(file.name, index)
+                meta = data.new_metadata(file, index)
                 date = parse(row['trade_date']).date()
                 ticker = row['symbol']
                 trade_type = row['trade_type']
@@ -82,7 +81,7 @@ class Importer(importer.ImporterProtocol):
                     txn = data.Transaction(
                         meta,
                         date,
-                        self.FLAG,
+                        flags.FLAG_OKAY,
                         None,
                         narration,
                         data.EMPTY_SET,
@@ -101,7 +100,7 @@ class Importer(importer.ImporterProtocol):
                     txn = data.Transaction(
                         meta,
                         date,
-                        self.FLAG,
+                        flags.FLAG_OKAY,
                         None,
                         narration,
                         data.EMPTY_SET,
@@ -117,5 +116,3 @@ class Importer(importer.ImporterProtocol):
                 entries.append(txn)             
 
         return entries
-
-
